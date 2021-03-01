@@ -6,8 +6,6 @@ permalink: /respond-events/
 <html>
 
 <head>
-    <title>Respond to Events</title>
-
     <script type="text/javascript"
 	    src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
 
