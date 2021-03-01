@@ -35,3 +35,22 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+
+
+<h1> Mapping Radius with Flexible Center Location </h1>
+
+<script src= "https://public.tableau.com/javascripts/api/tableau-2.min.js" ></script>
+<div id="tableauViz"></div>
+
+function initializeViz() {
+var placeholderDiv = document.getElementById("tableauViz");
+var url = "http://public.tableau.com/views/MappingViewFlexible/MappingView";
+var options = {
+ width: '600px',
+ height: '600px',
+ hideTabs: true,
+ hideToolbar: true,
+ };
+viz = new tableau.Viz(placeholderDiv, url, options);
+}
+
