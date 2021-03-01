@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Respond to Events</title>
+
+    <script type="text/javascript"
+	    src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+
+    <script type="text/javascript">
+        var viz;
+
+        function initViz() {
+            var containerDiv = document.getElementById("vizContainer"),
+                url = "http://public.tableau.com/views/MappingViewFlexible/MappingView?:toolbar=no&:showShareOptions=false",
+                options = {
+                    hideTabs: true,
+                    onFirstInteractive: function () {
+                        listenToMarksSelection();
+                    }
+                };
+
+            viz = new tableau.Viz(containerDiv, url, options);
+			
+            var containerDiv2 = document.getElementById("vizContainer2"),
+                url2 = "http://public.tableau.com/views/MappingViewFlexible/DistancetoLocation?:device=desktop&:toolbar=no&:showShareOptions=false",
+                options2 = {
+					width: 400,
+					height: 750,
+                    hideTabs: true,
+					onFirstInteractive: function () {
+                        listenToParameterSelection();
+                    }
+                };
+
+            viz2 = new tableau.Viz(containerDiv2, url2, options2);
+        }
+		
+        function listenToMarksSelection() {
+            viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, onMarksSelection);
+        }
+
+        function listenToParameterSelection() {
+            viz.addEventListener(tableau.TableauEventName.PARAMETER_VALUE_CHANGE, onParamSelection);
+        }
+		
+        function onMarksSelection(marksEvent) {
+            return marksEvent.getMarksAsync().then(reportSelectedMarks);
+        }
+		
+		function onParamSelection(e){
+		   e.getParameterAsync().then(function(param){
+				var param_name = param.getName()
+				var param_value = param.getCurrentValue().formattedValue
+				viz2.getWorkbook().changeParameterValueAsync(param_name, param_value)
+		   });
+		   
+
+		}
+		
+		<!-- function onParamSelection(paramEvent) { -->
+            <!-- distance = paramEvent.getParameterAsync().currentValue; -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Distance", distance) -->
+        <!-- } -->
+
+        function reportSelectedMarks(marks) {
+            var html = "";
+
+            for (var markIndex = 0; markIndex < marks.length; markIndex++) {
+                var pairs = marks[markIndex].getPairs();
+
+                for (var pairIndex = 0; pairIndex < pairs.length; pairIndex++) {
+                    var pair = pairs[pairIndex];
+                    column_name = pair.fieldName;
+                    column_value = pair.formattedValue ;
+					html += column_name + ", " + column_value + '.......'
+					if (column_name == 'AVG(Latitude (generated))'){
+						latitude = column_value
+					} else if (column_name == 'AVG(Longitude (generated))'){
+						longitude = column_value
+					} else if (column_name == 'State Abbreviation'){
+						state_abbr = column_value
+					} else if (column_name == 'City'){
+						city = column_value
+					} else if (column_name == 'State'){
+						state = column_value
+					} else if (column_name == 'Distance'){
+						distance = column_value
+					}
+					
+                }
+            }
+
+            var infoDiv = document.getElementById('markDetails');
+            infoDiv.innerHTML = html;
+			
+			viz2.getWorkbook().changeParameterValueAsync("City", city)
+			viz2.getWorkbook().changeParameterValueAsync("Latitude", latitude)
+			viz2.getWorkbook().changeParameterValueAsync("Longitude", longitude)
+			viz2.getWorkbook().changeParameterValueAsync("State", state_abbr)
+
+        }
+
+        <!-- function listenToMarksSelection() { -->
+            <!-- viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, onMarksSelection); -->
+        <!-- } -->
+
+        <!-- function onMarksSelection(param) { -->
+<!-- //			parameters_array = Workbook.getParametersAsync(); // This is wrong -->
+<!-- //			console.log(parameters_array); // Will give you a Promise object, not an array of the parmaters -->
+			<!-- // Correct way with callback -->
+			<!-- workbook = viz.getWorkbook(); -->
+			<!-- workbook.getParametersAsync( -->
+			   <!-- // this is an anonymous function, but you could also have a named function -->
+			   <!-- // p represents whatever is returned from the Tableau Server. Check the reference -->
+			   <!-- function(p){ -->
+				   <!-- console.log(p); // I do this just to confirm what comes back. -->
+				   <!-- // In this case, p is an array of Parameter objects -->
+				   <!-- for(i=0;i<p.length;i++){ -->
+					  <!-- // You can find the methods for the Parameter object in the Reference Guide -->
+						<!-- p_name = p[i].getName(); -->
+						<!-- p_value = p[i].getCurrentValue(); // This is DataValue object -->
+						<!-- p_actual_value = p_value.value; // DataValue has value and formattedValue fields (not methods) -->
+						<!-- p_formatted_value = p_value.formattedValue; -->
+					  <!-- console.log('Parameter ' + p_name + ' has the value ' + p_formatted_value); -->
+						<!-- if (p_name == 'Latitude'){ -->
+							<!-- latitude = p_formatted_value -->
+						<!-- } else if (p_name == 'Longitude'){ -->
+							<!-- longitude = p_formatted_value -->
+						<!-- } else if (p_name == 'State'){ -->
+							<!-- state_abbr = p_formatted_value -->
+						<!-- } else if (p_name == 'City'){ -->
+							<!-- city = p_formatted_value -->
+						<!-- }  -->
+				   <!-- } -->
+
+				<!-- }); -->
+
+            <!-- latitude = param.getParameterAsync('Latitude').getCurrentValue().formattedValue -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Latitude", latitude)			 -->
+			
+			<!-- longitude = param.getParameterAsync('Longitude').getCurrentValue().formattedValue -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Longitude", longitude) -->
+			
+			<!-- city = param.getParameterAsync('City').getCurrentValue().formattedValue -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("City", city) -->
+			
+			<!-- state_abbr = param.getParameterAsync('State').getCurrentValue().formattedValue -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("State", state_abbr) -->
+			
+			<!-- distance = param.getParameterAsync('Distance').getCurrentValue().formattedValue -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Distance", distance) -->
+			
+        <!-- } -->
+
+        <!-- function reportSelectedMarks(latitude,longitude,city,state_abbr,distance) { -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("City", city) -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Latitude", latitude) -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Longitude", longitude) -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("State", state_abbr) -->
+			<!-- viz2.getWorkbook().changeParameterValueAsync("Distance", distance) -->
+		
+		<!-- } -->
+			
+		// Opens the Download to PDF dialog box
+        function exportToPDF() {
+            viz.showExportPDFDialog();
+            viz2.showExportPDFDialog();
+        }
+
+		// Opens the Download Crosstab dialog box
+        function exportToCSV() {
+            viz.showExportCrossTabDialog();
+        }
+
+		// Downloads the crosstab data in an Excel file
+        function exportToExcel() {
+            viz.exportCrossTabToExcel();
+        }
+
+		// Opens the Download Image dialog box
+        function exportImage() {
+            viz.showExportImageDialog();
+        }
+
+		// Opens the Download PowerPoint dialog box
+        function exportPowerPoint() {
+            viz.showExportPowerPointDialog();
+        }
+
+    </script>
+</head>
+
+<body onload="initViz();">
+    <div id="vizContainer" style="height:780px; overflow:auto;"></div>
+    <br>
+	<div id="markDetails" style="display: none;">Information about selected marks displays here.</div>
+    <button onclick="exportToPDF();">Export to PDF</button>
+    <button onclick="exportToCSV();">Export to CSV</button>
+    <button onclick="exportToExcel();">Export to Excel</button>
+    <button onclick="exportImage();">Export as Image</button>
+    <button onclick="exportPowerPoint();">Export to PowerPoint</button>
+	<div id="vizContainer2" style="width:420px; height:780px; overflow:auto;"></div>
+</body>
+
+</html>
